@@ -20,7 +20,7 @@ class IrBlockImpl internal constructor(
     override var type: IrType,
     override var origin: IrStatementOrigin?,
 ) : IrBlock() {
-    override val statements: MutableList<IrStatement> = ArrayList(3)
+    override val statements: MutableList<IrStatement> = ArrayList()
 
     override var attributeOwnerId: IrAttributeContainer = this
     override var originalBeforeInline: IrAttributeContainer? = null
@@ -53,7 +53,7 @@ fun IrBlockImpl(
     origin = origin,
 ).apply {
     println("IrBlockImpl")
-    this.statements.addAll(statements)
+    this.statements+=statements
 }
 
 fun IrBlockImpl.addIfNotNull(statement: IrStatement?) {

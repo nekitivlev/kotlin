@@ -63,21 +63,18 @@ class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyRes
         dataFlowAnalyzer.enterWhenExpression(whenExpression)
 
 
-        println("whenExpression.variables: ${whenExpression.variable}")
+
         return context.withWhenExpression(whenExpression, session) with@{
             @Suppress("NAME_SHADOWING")
             println("beforeTranformSubject")
             println("whenExpression.subject: ${whenExpression.subject}")
 
-            var whenExpression = whenExpression.transformVariable(transformer, ResolutionMode.ContextIndependent)
+            var whenExpression = whenExpression.transformVariables(transformer, ResolutionMode.ContextIndependent)
 
 
             println(session)
 
-            println(whenExpression.variable?.status)
-            println(whenExpression.variable?.initializer)
-            println(whenExpression.variable?.returnTypeRef)
-            println(whenExpression.variable?.backingField)
+
 
             whenExpression = whenExpression.transformSubject(transformer, ResolutionMode.ContextIndependent)
 

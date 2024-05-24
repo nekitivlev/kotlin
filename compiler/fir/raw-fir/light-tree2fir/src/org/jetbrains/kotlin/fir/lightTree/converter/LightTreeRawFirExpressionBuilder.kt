@@ -796,7 +796,7 @@ class LightTreeRawFirExpressionBuilder(
 
         if(variables.size == 1 && subjectExpression == null){
             subjectVariable = variables.first()
-            variables.removeLast()
+            variables.removeFirst()
         }
 
 
@@ -813,7 +813,7 @@ class LightTreeRawFirExpressionBuilder(
             source = whenExpression.toFirSourceElement()
             this.subject = subjectExpression
             this.subjectVariable = subjectVariable
-            this.variable = if(variables.size == 0) null else variables.last()
+            this.variables += variables
             usedAsExpression = whenExpression.usedAsExpression
             for (entry in whenEntries) {
                 shouldBind = shouldBind || entry.shouldBindSubject

@@ -952,7 +952,7 @@ class BodyResolveContext(
     }
 
     fun <T> withWhenExpression(whenExpression: FirWhenExpression, session: FirSession, f: () -> T): T {
-        if (whenExpression.subjectVariable == null && whenExpression.variable == null){
+        if (whenExpression.subjectVariable == null && whenExpression.variables.isEmpty()){
             println("withWhenExpression")
             return f()
         }

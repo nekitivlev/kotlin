@@ -823,7 +823,7 @@ object NodeConfigurator : AbstractFieldConfigurator<FirTreeBuilder>(FirTreeBuild
         }
 
         whenExpression.configure {
-            +field("variable", variable, nullable = true).withTransform()
+            +fieldList("variables", variable).withTransform()
             +field("subject", expression, nullable = true).withTransform()
             +field("subjectVariable", variable, nullable = true)
             +fieldList("branches", whenBranch).withTransform()
