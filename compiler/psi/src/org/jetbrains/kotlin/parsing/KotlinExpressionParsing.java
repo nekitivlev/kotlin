@@ -1649,7 +1649,33 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
 
         advance(); //IF_KEYWORD
 
-        parseCondition();
+
+        if (expect(LPAR, "Expecting a condition in parentheses '(...)'", EXPRESSION_FIRST)) {
+            while (true) {
+                PsiBuilder.Marker atIfStart = mark();
+                if (at(VAL_KEYWORD)) {
+                    IElementType declType = myKotlinParsing.parseProperty(KotlinParsing.DeclarationParsingMode.LOCAL);
+                    atIfStart.done(declType);
+                    atIfStart.setCustomEdgeTokenBinders(PrecedingDocCommentsBinder.INSTANCE, TrailingCommentsBinder.INSTANCE);
+                    if (at(SEMICOLON)) {
+                        advance();
+                    }
+                }
+                else {
+                    atIfStart.drop();
+                    break;
+                }
+            }
+            if (at(SEMICOLON)) {
+                advance(); // SEMICOLON
+            }
+
+            PsiBuilder.Marker condition = mark();
+            parseExpression();
+            condition.done(CONDITION);
+            expect(RPAR, "Expecting ')");
+        }
+
 
         PsiBuilder.Marker thenBranch = mark();
         if (!at(ELSE_KEYWORD) && !at(SEMICOLON)) {

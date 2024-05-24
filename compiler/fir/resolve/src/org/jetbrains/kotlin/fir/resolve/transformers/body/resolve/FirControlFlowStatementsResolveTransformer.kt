@@ -79,7 +79,7 @@ class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyRes
             whenExpression = whenExpression.transformSubject(transformer, ResolutionMode.ContextIndependent)
 
             println("beforeSubjectTypeResolution")
-
+            println("whenExpression.variables: ${whenExpression.variables}")
 
             println(whenExpression.subjectVariable?.status)
             println(whenExpression.subjectVariable?.initializer)

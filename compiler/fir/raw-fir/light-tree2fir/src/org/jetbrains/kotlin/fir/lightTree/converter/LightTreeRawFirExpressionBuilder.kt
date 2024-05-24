@@ -1354,6 +1354,7 @@ class LightTreeRawFirExpressionBuilder(
             source = ifExpression.toFirSourceElement()
             with(parseIfExpression(ifExpression)) {
                 val trueBranch = convertLoopBody(thenBlock)
+                variables += ifVariables
                 branches += buildWhenBranch {
                     source = firCondition?.source
                     condition = firCondition ?: buildErrorExpression(
@@ -1378,20 +1379,40 @@ class LightTreeRawFirExpressionBuilder(
         }
     }
 
-    private class IfNodeComponents(val firCondition: FirExpression?, val thenBlock: LighterASTNode?, val elseBlock: LighterASTNode?)
+    private class IfNodeComponents(val firCondition: FirExpression?, val ifVariables: MutableList<FirVariable>, val thenBlock: LighterASTNode?, val elseBlock: LighterASTNode?)
 
     private fun parseIfExpression(ifExpression: LighterASTNode): IfNodeComponents {
         var firCondition: FirExpression? = null
+        val ifVariables: MutableList<FirVariable> = mutableListOf()
         var thenBlock: LighterASTNode? = null
         var elseBlock: LighterASTNode? = null
         ifExpression.forEachChildren {
             when (it.tokenType) {
+                PROPERTY -> {
+                    val tempVariable = (declarationBuilder.convertPropertyDeclaration(it) as FirVariable).let { variable ->
+                        buildProperty {
+                            source = it.toFirSourceElement()
+                            origin = FirDeclarationOrigin.Source
+                            moduleData = baseModuleData
+                            returnTypeRef = variable.returnTypeRef
+                            name = variable.name
+                            initializer = variable.initializer
+                            isVar = false
+                            symbol = FirPropertySymbol(variable.name)
+                            isLocal = true
+                            status = FirDeclarationStatusImpl(Visibilities.Local, Modality.FINAL)
+                            annotations += variable.annotations
+                        }
+                    }
+
+                    ifVariables+=tempVariable
+                }
                 CONDITION -> firCondition = getAsFirExpression(it, "If statement should have condition")
                 THEN -> thenBlock = it
                 ELSE -> elseBlock = it
             }
         }
-        return IfNodeComponents(firCondition, thenBlock, elseBlock)
+        return IfNodeComponents(firCondition, ifVariables, thenBlock, elseBlock)
     }
 
     private val LighterASTNode.usedAsExpression: Boolean
