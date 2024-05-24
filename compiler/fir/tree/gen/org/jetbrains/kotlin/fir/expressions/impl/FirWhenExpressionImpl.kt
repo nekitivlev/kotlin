@@ -28,6 +28,7 @@ internal class FirWhenExpressionImpl(
     override var coneTypeOrNull: ConeKotlinType?,
     override var annotations: MutableOrEmptyList<FirAnnotation>,
     override var calleeReference: FirReference,
+    override var variable: FirVariable?,
     override var subject: FirExpression?,
     override var subjectVariable: FirVariable?,
     override val branches: MutableList<FirWhenBranch>,
@@ -38,6 +39,7 @@ internal class FirWhenExpressionImpl(
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         annotations.forEach { it.accept(visitor, data) }
         calleeReference.accept(visitor, data)
+        variable?.accept(visitor, data)
         val subjectVariable_ = subjectVariable
         if (subjectVariable_ != null) {
             subjectVariable_.accept(visitor, data)
@@ -49,6 +51,7 @@ internal class FirWhenExpressionImpl(
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirWhenExpressionImpl {
         transformCalleeReference(transformer, data)
+        transformVariable(transformer, data)
         transformSubject(transformer, data)
         transformBranches(transformer, data)
         transformOtherChildren(transformer, data)
@@ -62,6 +65,11 @@ internal class FirWhenExpressionImpl(
 
     override fun <D> transformCalleeReference(transformer: FirTransformer<D>, data: D): FirWhenExpressionImpl {
         calleeReference = calleeReference.transform(transformer, data)
+        return this
+    }
+
+    override fun <D> transformVariable(transformer: FirTransformer<D>, data: D): FirWhenExpressionImpl {
+        variable = variable?.transform(transformer, data)
         return this
     }
 

@@ -155,6 +155,7 @@ open class FirImplicitAwareBodyResolveTransformer(
     }
 
     override fun transformProperty(property: FirProperty, data: ResolutionMode): FirProperty {
+        println("FirImplicitBodyResolve.transformProperty")
         return computeCachedTransformationResult(property) {
             super.transformProperty(property, data)
         }

@@ -271,6 +271,7 @@ class Fir2IrVisitor(
                                 }
                             }
                             statement is FirVariable && statement.isDestructuringDeclarationContainerVariable == true -> {
+                                println("visitScript")
                                 statement.convertWithOffsets { startOffset, endOffset ->
                                     IrCompositeImpl(
                                         startOffset, endOffset,
@@ -465,6 +466,8 @@ class Fir2IrVisitor(
         val isNextVariable = initializer is FirFunctionCall &&
                 initializer.calleeReference.toResolvedNamedFunctionSymbol()?.callableId?.isIteratorNext() == true &&
                 variable.source?.isChildOfForLoop == true
+
+        println("visitLocalVariable")
         val irVariable = declarationStorage.createAndCacheIrVariable(
             variable, conversionScope.parentFromStack(),
             if (isNextVariable) {
@@ -496,6 +499,7 @@ class Fir2IrVisitor(
         }
 
     override fun visitProperty(property: FirProperty, data: Any?): IrElement = whileAnalysing(session, property) {
+        println("visitProperty")
         if (property.isLocal) return visitLocalVariable(property)
         @OptIn(UnsafeDuringIrConstructionAPI::class)
         val irProperty = declarationStorage.getCachedIrPropertySymbol(property, fakeOverrideOwnerLookupTag = null)?.owner
@@ -1224,14 +1228,20 @@ class Fir2IrVisitor(
 
             generateWhen(
                 startOffset, endOffset, IrStatementOrigin.ELVIS,
-                irLhsVariable, irBranches,
+                irLhsVariable, null, irBranches,
                 elvisExpression.resolvedType.toIrType()
             )
         }
     }
 
     override fun visitWhenExpression(whenExpression: FirWhenExpression, data: Any?): IrElement {
+        println("Fir2IrVisitor.visitWhenExpression")
+        println("beforeWhenVariable")
+        val whenVariable = generateWhenVariable(whenExpression)
+        println("Fir2IrVisitor.visitWhenExpression: $whenVariable")
         val subjectVariable = generateWhenSubjectVariable(whenExpression)
+
+
         val origin = when (whenExpression.source?.elementType) {
             KtNodeTypes.WHEN -> IrStatementOrigin.WHEN
             KtNodeTypes.IF -> IrStatementOrigin.IF
@@ -1243,7 +1253,8 @@ class Fir2IrVisitor(
             KtNodeTypes.POSTFIX_EXPRESSION -> IrStatementOrigin.EXCLEXCL
             else -> null
         }
-        return conversionScope.withWhenSubject(subjectVariable) {
+
+        return conversionScope.withWhenSubject(subjectVariable, whenVariable) {
             whenExpression.convertWithOffsets { startOffset, endOffset ->
                 if (whenExpression.branches.isEmpty()) {
                     return@convertWithOffsets IrBlockImpl(startOffset, endOffset, irBuiltIns.unitType, origin)
@@ -1269,7 +1280,9 @@ class Fir2IrVisitor(
                         IrConstImpl.boolean(startOffset, endOffset, irBuiltIns.booleanType, true), irResult
                     )
                 }
-                generateWhen(startOffset, endOffset, origin, subjectVariable, irBranches, whenExpressionType.toIrType())
+                println("Fir2IrVisitor.visitWhenExpression: $whenVariable")
+                println("Fir2IrVisitor.visitWhenExpression: $subjectVariable")
+                generateWhen(startOffset, endOffset, origin, subjectVariable, whenVariable, irBranches, whenExpressionType.toIrType())
             }
         }.also {
             whenExpression.accept(implicitCastInserter, it)
@@ -1332,15 +1345,25 @@ class Fir2IrVisitor(
         endOffset: Int,
         origin: IrStatementOrigin?,
         subjectVariable: IrVariable?,
+        whenVariable: IrVariable?,
         branches: List<IrBranch>,
         resultType: IrType
     ): IrExpression {
         // Note: ELVIS origin is set only on wrapping block
         val irWhen = IrWhenImpl(startOffset, endOffset, resultType, origin.takeIf { it != IrStatementOrigin.ELVIS }, branches)
-        return if (subjectVariable == null) {
+        return if (subjectVariable == null && whenVariable == null) {
+            println("generateWhen1")
             irWhen
-        } else {
+        } else if (subjectVariable != null && whenVariable == null){
+            println("generateWhen3")
             IrBlockImpl(startOffset, endOffset, irWhen.type, origin, listOf(subjectVariable, irWhen))
+        }else if (subjectVariable == null && whenVariable != null){
+            println("generateWhen2")
+            IrBlockImpl(startOffset, endOffset, irWhen.type, origin, listOf(whenVariable, irWhen))
+        }else if(subjectVariable!= null && whenVariable != null){
+            IrBlockImpl(startOffset, endOffset, irWhen.type, origin, listOf(whenVariable, subjectVariable, irWhen))
+        }else{
+            irWhen
         }
     }
 
@@ -1352,6 +1375,14 @@ class Fir2IrVisitor(
             subjectExpression != null -> {
                 applyParentFromStackTo(callablesGenerator.declareTemporaryVariable(convertToIrExpression(subjectExpression), "subject"))
             }
+            else -> null
+        }
+    }
+
+    private fun generateWhenVariable(whenExpression: FirWhenExpression): IrVariable? {
+        val whenVariable = whenExpression.variable
+        return when {
+            whenVariable != null -> whenVariable.accept(this, null) as IrVariable
             else -> null
         }
     }

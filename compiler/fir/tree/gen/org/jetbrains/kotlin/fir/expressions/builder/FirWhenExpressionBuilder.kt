@@ -28,6 +28,7 @@ class FirWhenExpressionBuilder : FirAnnotationContainerBuilder, FirExpressionBui
     override var coneTypeOrNull: ConeKotlinType? = null
     override val annotations: MutableList<FirAnnotation> = mutableListOf()
     var calleeReference: FirReference = FirStubReference
+    var variable: FirVariable? = null
     var subject: FirExpression? = null
     var subjectVariable: FirVariable? = null
     val branches: MutableList<FirWhenBranch> = mutableListOf()
@@ -40,6 +41,7 @@ class FirWhenExpressionBuilder : FirAnnotationContainerBuilder, FirExpressionBui
             coneTypeOrNull,
             annotations.toMutableOrEmpty(),
             calleeReference,
+            variable,
             subject,
             subjectVariable,
             branches,

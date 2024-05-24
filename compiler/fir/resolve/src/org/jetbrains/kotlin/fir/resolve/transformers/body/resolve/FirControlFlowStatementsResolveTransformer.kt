@@ -61,11 +61,39 @@ class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyRes
         }
         whenExpression.annotations.forEach { it.accept(this, data) }
         dataFlowAnalyzer.enterWhenExpression(whenExpression)
+
+
+        println("whenExpression.variables: ${whenExpression.variable}")
         return context.withWhenExpression(whenExpression, session) with@{
             @Suppress("NAME_SHADOWING")
-            var whenExpression = whenExpression.transformSubject(transformer, ResolutionMode.ContextIndependent)
+            println("beforeTranformSubject")
+            println("whenExpression.subject: ${whenExpression.subject}")
+
+            var whenExpression = whenExpression.transformVariable(transformer, ResolutionMode.ContextIndependent)
+
+
+            println(session)
+
+            println(whenExpression.variable?.status)
+            println(whenExpression.variable?.initializer)
+            println(whenExpression.variable?.returnTypeRef)
+            println(whenExpression.variable?.backingField)
+
+            whenExpression = whenExpression.transformSubject(transformer, ResolutionMode.ContextIndependent)
+
+            println("beforeSubjectTypeResolution")
+
+
+            println(whenExpression.subjectVariable?.status)
+            println(whenExpression.subjectVariable?.initializer)
+            println(whenExpression.subjectVariable?.returnTypeRef)
+            println(whenExpression.subjectVariable?.backingField)
             val subjectType = whenExpression.subject?.resolvedType?.fullyExpandedType(session)
+
+            println("afterSubjectTypeResolution")
             var completionNeeded = false
+
+
             context.withWhenSubjectType(subjectType, components) {
                 when {
                     whenExpression.branches.isEmpty() -> {
@@ -115,9 +143,12 @@ class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyRes
                 }
                 dataFlowAnalyzer.exitWhenExpression(whenExpression, data.forceFullCompletion)
                 whenExpression = whenExpression.replaceReturnTypeIfNotExhaustive()
+                println("what???")
                 whenExpression
             }
+
         }
+
     }
 
     private fun FirWhenExpression.replaceReturnTypeIfNotExhaustive(): FirWhenExpression {

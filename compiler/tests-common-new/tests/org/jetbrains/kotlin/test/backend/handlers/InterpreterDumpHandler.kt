@@ -170,7 +170,7 @@ interface FirEvaluatorDumpHandler : EvaluatorHandler {
             override fun visitProperty(property: FirProperty, data: Options) {
                 if (property in visitedElements) return
                 visitedElements.add(property)
-
+                println("InterpreterDumpHandler")
                 super.visitProperty(property, data)
                 property.evaluatedInitializer?.unwrapOr<FirExpression> { }?.let { result ->
                     with(ConstValueProviderImpl) {

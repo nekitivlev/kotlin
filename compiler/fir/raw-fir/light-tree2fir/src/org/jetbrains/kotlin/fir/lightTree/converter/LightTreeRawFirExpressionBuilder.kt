@@ -762,22 +762,27 @@ class LightTreeRawFirExpressionBuilder(
         var subjectVariable: FirVariable? = null
         val whenEntryNodes = mutableListOf<LighterASTNode>()
         val whenEntries = mutableListOf<WhenEntry>()
+        val variables = mutableListOf<FirVariable>()
         whenExpression.forEachChildren {
             when (it.tokenType) {
-                PROPERTY -> subjectVariable = (declarationBuilder.convertPropertyDeclaration(it) as FirVariable).let { variable ->
-                    buildProperty {
-                        source = it.toFirSourceElement()
-                        origin = FirDeclarationOrigin.Source
-                        moduleData = baseModuleData
-                        returnTypeRef = variable.returnTypeRef
-                        name = variable.name
-                        initializer = variable.initializer
-                        isVar = false
-                        symbol = FirPropertySymbol(variable.name)
-                        isLocal = true
-                        status = FirDeclarationStatusImpl(Visibilities.Local, Modality.FINAL)
-                        annotations += variable.annotations
+                PROPERTY -> {
+                    val tempVariable = (declarationBuilder.convertPropertyDeclaration(it) as FirVariable).let { variable ->
+                        buildProperty {
+                            source = it.toFirSourceElement()
+                            origin = FirDeclarationOrigin.Source
+                            moduleData = baseModuleData
+                            returnTypeRef = variable.returnTypeRef
+                            name = variable.name
+                            initializer = variable.initializer
+                            isVar = false
+                            symbol = FirPropertySymbol(variable.name)
+                            isLocal = true
+                            status = FirDeclarationStatusImpl(Visibilities.Local, Modality.FINAL)
+                            annotations += variable.annotations
+                        }
                     }
+
+                    variables+=tempVariable
                 }
                 DESTRUCTURING_DECLARATION -> subjectExpression =
                     getAsFirExpression(it, "Incorrect when subject expression: ${whenExpression.asText}")
@@ -786,6 +791,15 @@ class LightTreeRawFirExpressionBuilder(
                     getAsFirExpression(it, "Incorrect when subject expression: ${whenExpression.asText}")
             }
         }
+
+        println("subjectExpression :$subjectExpression")
+
+        if(variables.size == 1 && subjectExpression == null){
+            subjectVariable = variables.first()
+            variables.removeLast()
+        }
+
+
         subjectExpression = subjectVariable?.initializer ?: subjectExpression
         val hasSubject = subjectExpression != null
 
@@ -799,6 +813,7 @@ class LightTreeRawFirExpressionBuilder(
             source = whenExpression.toFirSourceElement()
             this.subject = subjectExpression
             this.subjectVariable = subjectVariable
+            this.variable = if(variables.size == 0) null else variables.last()
             usedAsExpression = whenExpression.usedAsExpression
             for (entry in whenEntries) {
                 shouldBind = shouldBind || entry.shouldBindSubject

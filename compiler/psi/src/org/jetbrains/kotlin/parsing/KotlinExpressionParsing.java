@@ -866,6 +866,7 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
         if (at(LPAR)) {
             advanceAt(LPAR);
 
+
             PsiBuilder.Marker atWhenStart = mark();
             myKotlinParsing.parseAnnotationsList(EQ_RPAR_SET);
             if (at(VAL_KEYWORD) || at(VAR_KEYWORD)) {
@@ -873,6 +874,27 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
 
                 atWhenStart.done(declType);
                 atWhenStart.setCustomEdgeTokenBinders(PrecedingDocCommentsBinder.INSTANCE, TrailingCommentsBinder.INSTANCE);
+
+                if(at(SEMICOLON)){
+                    advance();
+                    while(true){
+                        PsiBuilder.Marker atWhenStarts = mark();
+                        if (at(VAL_KEYWORD)) {
+                            IElementType declTypeNew = myKotlinParsing.parseProperty(KotlinParsing.DeclarationParsingMode.LOCAL);
+
+                            atWhenStarts.done(declTypeNew);
+                            atWhenStarts.setCustomEdgeTokenBinders(PrecedingDocCommentsBinder.INSTANCE, TrailingCommentsBinder.INSTANCE);
+                            if (at(SEMICOLON)) {
+                                advance();
+                            }
+                        }
+                        else {
+                            atWhenStarts.drop();
+                            parseExpression();
+                            break;
+                        }
+                    }
+                }
             }
             else {
                 atWhenStart.drop();
