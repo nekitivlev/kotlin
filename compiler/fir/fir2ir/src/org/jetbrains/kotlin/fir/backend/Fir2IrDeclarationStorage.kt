@@ -1028,7 +1028,6 @@ class Fir2IrDeclarationStorage(
         irParent: IrDeclarationParent,
         givenOrigin: IrDeclarationOrigin? = null
     ): IrVariable {
-        println("createAndCacheIrVariable: $variable")
         return callablesGenerator.createIrVariable(variable, irParent, givenOrigin).also {
             localStorage.putVariable(variable, it.symbol)
         }

@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.KtNodeTypes;
 import org.jetbrains.kotlin.lexer.KtTokens;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class KtWhenExpression extends KtExpressionImpl {
@@ -35,6 +36,9 @@ public class KtWhenExpression extends KtExpressionImpl {
         return findChildrenByType(KtNodeTypes.WHEN_ENTRY);
     }
 
+    public List<KtProperty> getWhenVariables() {
+        return Arrays.asList(findChildrenByClass(KtProperty.class));
+    }
     @Nullable
     public KtProperty getSubjectVariable() {
         return findChildByClass(KtProperty.class);
@@ -42,7 +46,8 @@ public class KtWhenExpression extends KtExpressionImpl {
 
     @Nullable
     public KtExpression getSubjectExpression() {
-        return findChildByClass(KtExpression.class);
+        KtExpression[] expressions = findChildrenByClass(KtExpression.class);
+        return expressions.length > 0 ? expressions[expressions.length - 1] : null;
     }
 
     @Override

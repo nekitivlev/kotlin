@@ -33,7 +33,6 @@ abstract class FirPartialBodyResolveTransformer(
         }
 
     override fun <E : FirElement> transformElement(element: E, data: ResolutionMode): E {
-        println("FirPartialBodyResolveTransformer.transformElement $element")
         return element.transform(transformer, data)
     }
 }

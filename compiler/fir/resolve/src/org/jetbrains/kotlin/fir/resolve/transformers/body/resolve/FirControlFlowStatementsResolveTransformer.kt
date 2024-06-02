@@ -66,28 +66,17 @@ class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyRes
 
         return context.withWhenExpression(whenExpression, session) with@{
             @Suppress("NAME_SHADOWING")
-            println("beforeTranformSubject")
-            println("whenExpression.subject: ${whenExpression.subject}")
 
             var whenExpression = whenExpression.transformVariables(transformer, ResolutionMode.ContextIndependent)
 
 
-            println(session)
 
 
 
             whenExpression = whenExpression.transformSubject(transformer, ResolutionMode.ContextIndependent)
 
-            println("beforeSubjectTypeResolution")
-            println("whenExpression.variables: ${whenExpression.variables}")
-
-            println(whenExpression.subjectVariable?.status)
-            println(whenExpression.subjectVariable?.initializer)
-            println(whenExpression.subjectVariable?.returnTypeRef)
-            println(whenExpression.subjectVariable?.backingField)
             val subjectType = whenExpression.subject?.resolvedType?.fullyExpandedType(session)
 
-            println("afterSubjectTypeResolution")
             var completionNeeded = false
 
 
@@ -140,7 +129,6 @@ class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyRes
                 }
                 dataFlowAnalyzer.exitWhenExpression(whenExpression, data.forceFullCompletion)
                 whenExpression = whenExpression.replaceReturnTypeIfNotExhaustive()
-                println("what???")
                 whenExpression
             }
 

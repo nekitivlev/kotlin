@@ -125,7 +125,6 @@ open class FirDeclarationsResolveTransformer(
 
     override fun transformProperty(property: FirProperty, data: ResolutionMode): FirProperty = whileAnalysing(session, property) {
         require(property !is FirSyntheticProperty) { "Synthetic properties should not be processed by body transformers" }
-        println("transofrmProperty, property: $property")
         // script top level destructuring declaration container variables should be treated as properties here
         // to avoid CFG/DFA complications
         if (property.isLocal && property.origin != FirDeclarationOrigin.Synthetic.ScriptTopLevelDestructuringDeclarationContainer) {
@@ -515,7 +514,6 @@ open class FirDeclarationsResolveTransformer(
     }
 
     private fun transformLocalVariable(variable: FirProperty): FirProperty = whileAnalysing(session, variable) {
-        println("transformLocalVariable: $variable")
         assert(variable.isLocal)
         val delegate = variable.delegate
 

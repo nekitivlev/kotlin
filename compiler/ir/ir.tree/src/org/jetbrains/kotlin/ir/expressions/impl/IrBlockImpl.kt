@@ -52,8 +52,7 @@ fun IrBlockImpl(
     type = type,
     origin = origin,
 ).apply {
-    println("IrBlockImpl")
-    this.statements+=statements
+    this.statements += statements
 }
 
 fun IrBlockImpl.addIfNotNull(statement: IrStatement?) {

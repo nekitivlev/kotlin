@@ -144,6 +144,12 @@ public class FirLightTreeBlackBoxCodegenWithFir2IrFakeOverrideGeneratorTestGener
     }
 
     @Test
+    @TestMetadata("compoundNoTypeUseIfFlagIsSpecified.kt")
+    public void testCompoundNoTypeUseIfFlagIsSpecified() {
+      runTest("compiler/testData/codegen/box/annotations/compoundNoTypeUseIfFlagIsSpecified.kt");
+    }
+
+    @Test
     @TestMetadata("constValInAnnotation.kt")
     public void testConstValInAnnotation() {
       runTest("compiler/testData/codegen/box/annotations/constValInAnnotation.kt");
@@ -13323,6 +13329,12 @@ public class FirLightTreeBlackBoxCodegenWithFir2IrFakeOverrideGeneratorTestGener
       }
 
       @Test
+      @TestMetadata("ifStatementCompound.kt")
+      public void testIfStatementCompound() {
+        runTest("compiler/testData/codegen/box/coroutines/controlFlow/ifStatementCompound.kt");
+      }
+
+      @Test
       @TestMetadata("kt22694_1_3.kt")
       public void testKt22694_1_3() {
         runTest("compiler/testData/codegen/box/coroutines/controlFlow/kt22694_1_3.kt");
@@ -20201,6 +20213,12 @@ public class FirLightTreeBlackBoxCodegenWithFir2IrFakeOverrideGeneratorTestGener
     @TestMetadata("classMethodCallExtensionSuper.kt")
     public void testClassMethodCallExtensionSuper() {
       runTest("compiler/testData/codegen/box/extensionFunctions/classMethodCallExtensionSuper.kt");
+    }
+
+    @Test
+    @TestMetadata("compoundWhenFail.kt")
+    public void testCompoundWhenFail() {
+      runTest("compiler/testData/codegen/box/extensionFunctions/compoundWhenFail.kt");
     }
 
     @Test
@@ -34409,6 +34427,12 @@ public class FirLightTreeBlackBoxCodegenWithFir2IrFakeOverrideGeneratorTestGener
     @TestMetadata("removeIf.kt")
     public void testRemoveIf() {
       runTest("compiler/testData/codegen/box/jdk/removeIf.kt");
+    }
+
+    @Test
+    @TestMetadata("removeIfCompound.kt")
+    public void testRemoveIfCompound() {
+      runTest("compiler/testData/codegen/box/jdk/removeIfCompound.kt");
     }
 
     @Test
@@ -58611,6 +58635,12 @@ public class FirLightTreeBlackBoxCodegenWithFir2IrFakeOverrideGeneratorTestGener
     @TestMetadata("callProperty.kt")
     public void testCallProperty() {
       runTest("compiler/testData/codegen/box/when/callProperty.kt");
+    }
+
+    @Test
+    @TestMetadata("callPropertyCompound.kt")
+    public void testCallPropertyCompound() {
+      runTest("compiler/testData/codegen/box/when/callPropertyCompound.kt");
     }
 
     @Test

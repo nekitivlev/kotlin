@@ -91,7 +91,6 @@ class Fir2IrConverter(
         //   If we encounter local class / anonymous object in signature, then (1) and (2) is performed immediately for this class,
         //   and (3) and (4) a bit later
         for (firFile in allFirFiles) {
-            println("classmember")
             processFileAndClassMembers(firFile)
         }
         //   4. Override processing which sets overridden symbols for everything inside non-local regular classes
@@ -116,7 +115,6 @@ class Fir2IrConverter(
         //   If we encounter local class / anonymous object here, then we perform all (1)-(5) stages immediately
         delegatedMemberGenerator.generateBodies()
         for (firFile in allFirFiles) {
-            println("delegatedMemberGenerator")
             withFileAnalysisExceptionWrapping(firFile) {
                 firFile.accept(fir2irVisitor, null)
             }

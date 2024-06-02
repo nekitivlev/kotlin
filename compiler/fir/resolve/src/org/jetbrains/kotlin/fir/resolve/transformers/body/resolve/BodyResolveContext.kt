@@ -226,7 +226,6 @@ class BodyResolveContext(
 
     @PrivateForInline
     fun addLocalScope(localScope: FirLocalScope) {
-        println("addLocalScope: $localScope")
         replaceTowerDataContext(towerDataContext.addLocalScope(localScope))
     }
 
@@ -238,7 +237,6 @@ class BodyResolveContext(
     @PrivateForInline
     private inline fun updateLastScope(transform: FirLocalScope.() -> FirLocalScope) {
         val lastScope = towerDataContext.localScopes.lastOrNull() ?: return
-        println("updateLastScope: $lastScope")
         replaceTowerDataContext(towerDataContext.setLastLocalScope(lastScope.transform()))
     }
 
@@ -329,7 +327,6 @@ class BodyResolveContext(
 
     @OptIn(PrivateForInline::class)
     fun storeVariable(variable: FirVariable, session: FirSession) {
-        println("BodyResolveContext.storeVariable: $variable")
         updateLastScope { storeVariable(variable, session) }
     }
 
@@ -629,7 +626,6 @@ class BodyResolveContext(
             session.languageVersionSettings.supportsFeature(LanguageFeature.ContextSensitiveEnumResolutionInWhen)
 
         if (withContextSensitiveResolution) {
-            println("withWhenSubjectTupe: $whenSubjectImportingScopes")
             val subjectClassSymbol = (subjectType as? ConeClassLikeType)
                 ?.lookupTag?.toFirRegularClassSymbol(session)?.takeIf { it.fir.classKind == ClassKind.ENUM_CLASS }
             val whenSubjectImportingScope = subjectClassSymbol?.let {
@@ -953,7 +949,6 @@ class BodyResolveContext(
 
     fun <T> withWhenExpression(whenExpression: FirWhenExpression, session: FirSession, f: () -> T): T {
         if (whenExpression.subjectVariable == null && whenExpression.variables.isEmpty()){
-            println("withWhenExpression")
             return f()
         }
         return forBlock(session, f)
@@ -961,7 +956,6 @@ class BodyResolveContext(
 
     @OptIn(PrivateForInline::class)
     inline fun <T> forBlock(session: FirSession, f: () -> T): T {
-        println("forBlock")
         return withTowerDataCleanup {
             addLocalScope(FirLocalScope(session))
             f()

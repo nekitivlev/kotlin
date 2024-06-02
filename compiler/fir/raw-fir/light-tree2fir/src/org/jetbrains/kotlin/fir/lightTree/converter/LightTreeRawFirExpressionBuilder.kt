@@ -218,9 +218,9 @@ class LightTreeRawFirExpressionBuilder(
             body = withForcedLocalContext {
                 if (block != null) {
                     val kind = runIf(destructuringStatements.isNotEmpty()) {
-                    KtFakeSourceElementKind.LambdaDestructuringBlock
-                }
-                val bodyBlock = declarationBuilder.convertBlockExpressionWithoutBuilding(block!!, kind).apply {
+                        KtFakeSourceElementKind.LambdaDestructuringBlock
+                    }
+                    val bodyBlock = declarationBuilder.convertBlockExpressionWithoutBuilding(block!!, kind).apply {
                         statements.firstOrNull()?.let {
                             if (it.isContractBlockFirCheck()) {
                                 this@buildAnonymousFunction.contractDescription = it.toLegacyRawContractDescription()
@@ -241,16 +241,16 @@ class LightTreeRawFirExpressionBuilder(
                         }
                     }.build()
 
-                if (destructuringStatements.isNotEmpty()) {
-                    // Destructured variables must be in a separate block so that they can be shadowed.
-                    buildBlock {
-                        source = bodyBlock.source?.realElement()
-                        statements.addAll(destructuringStatements)
-                        statements.add(bodyBlock)
+                    if (destructuringStatements.isNotEmpty()) {
+                        // Destructured variables must be in a separate block so that they can be shadowed.
+                        buildBlock {
+                            source = bodyBlock.source?.realElement()
+                            statements.addAll(destructuringStatements)
+                            statements.add(bodyBlock)
+                        }
+                    } else {
+                        bodyBlock
                     }
-                } else {
-                    bodyBlock
-                }
                 } else {
                     buildSingleExpressionBlock(buildErrorExpression(null, ConeSyntaxDiagnostic("Lambda has no body")))
                 }
@@ -792,7 +792,6 @@ class LightTreeRawFirExpressionBuilder(
             }
         }
 
-        println("subjectExpression :$subjectExpression")
 
         if(variables.size == 1 && subjectExpression == null){
             subjectVariable = variables.first()
