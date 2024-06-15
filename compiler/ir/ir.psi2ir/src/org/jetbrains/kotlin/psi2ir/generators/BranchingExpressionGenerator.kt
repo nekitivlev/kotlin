@@ -38,6 +38,8 @@ import org.jetbrains.kotlin.utils.SmartList
 internal class BranchingExpressionGenerator(statementGenerator: StatementGenerator) : StatementGeneratorExtension(statementGenerator) {
 
     fun generateIfExpression(expression: KtIfExpression): IrExpression {
+
+        println("ir.psi2ir.generateIfExpression")
         var ktLastIf: KtIfExpression = expression
         val irBranches = SmartList<IrBranch>()
         var irElseBranch: IrExpression? = null

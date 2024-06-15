@@ -10540,6 +10540,12 @@ public class FirPsiBlackBoxCodegenTestGenerated extends AbstractFirPsiBlackBoxCo
     }
 
     @Test
+    @TestMetadata("compoundWhenWithIntervals.kt")
+    public void testCompoundWhenWithIntervals() {
+      runTest("compiler/testData/codegen/box/controlStructures/compoundWhenWithIntervals.kt");
+    }
+
+    @Test
     @TestMetadata("conditionOfEmptyIf.kt")
     public void testConditionOfEmptyIf() {
       runTest("compiler/testData/codegen/box/controlStructures/conditionOfEmptyIf.kt");
@@ -10687,6 +10693,30 @@ public class FirPsiBlackBoxCodegenTestGenerated extends AbstractFirPsiBlackBoxCo
     @TestMetadata("forUserType.kt")
     public void testForUserType() {
       runTest("compiler/testData/codegen/box/controlStructures/forUserType.kt");
+    }
+
+    @Test
+    @TestMetadata("ifCompoundConst1.kt")
+    public void testIfCompoundConst1() {
+      runTest("compiler/testData/codegen/box/controlStructures/ifCompoundConst1.kt");
+    }
+
+    @Test
+    @TestMetadata("ifCompoundConst2.kt")
+    public void testIfCompoundConst2() {
+      runTest("compiler/testData/codegen/box/controlStructures/ifCompoundConst2.kt");
+    }
+
+    @Test
+    @TestMetadata("ifCompoundIncompatibleBranches.kt")
+    public void testIfCompoundIncompatibleBranches() {
+      runTest("compiler/testData/codegen/box/controlStructures/ifCompoundIncompatibleBranches.kt");
+    }
+
+    @Test
+    @TestMetadata("ifCompoundWithException.kt")
+    public void testIfCompoundWithException() {
+      runTest("compiler/testData/codegen/box/controlStructures/ifCompoundWithException.kt");
     }
 
     @Test
@@ -11017,6 +11047,18 @@ public class FirPsiBlackBoxCodegenTestGenerated extends AbstractFirPsiBlackBoxCo
     @TestMetadata("tryFinallyGeneric.kt")
     public void testTryFinallyGeneric() {
       runTest("compiler/testData/codegen/box/controlStructures/tryFinallyGeneric.kt");
+    }
+
+    @Test
+    @TestMetadata("tryFinallyGenericWithCompoundIf.kt")
+    public void testTryFinallyGenericWithCompoundIf() {
+      runTest("compiler/testData/codegen/box/controlStructures/tryFinallyGenericWithCompoundIf.kt");
+    }
+
+    @Test
+    @TestMetadata("WhenCompoundWithException.kt")
+    public void testWhenCompoundWithException() {
+      runTest("compiler/testData/codegen/box/controlStructures/WhenCompoundWithException.kt");
     }
 
     @Nested
@@ -11971,6 +12013,18 @@ public class FirPsiBlackBoxCodegenTestGenerated extends AbstractFirPsiBlackBoxCo
     @TestMetadata("callOnSmarcastedNothing.kt")
     public void testCallOnSmarcastedNothing() {
       runTest("compiler/testData/codegen/box/controlflow/callOnSmarcastedNothing.kt");
+    }
+
+    @Test
+    @TestMetadata("callOnSmartcastedNothingCompoundIf.kt")
+    public void testCallOnSmartcastedNothingCompoundIf() {
+      runTest("compiler/testData/codegen/box/controlflow/callOnSmartcastedNothingCompoundIf.kt");
+    }
+
+    @Test
+    @TestMetadata("callOnSmartcastedNothingCompoundWhen.kt")
+    public void testCallOnSmartcastedNothingCompoundWhen() {
+      runTest("compiler/testData/codegen/box/controlflow/callOnSmartcastedNothingCompoundWhen.kt");
     }
 
     @Test
@@ -20213,6 +20267,12 @@ public class FirPsiBlackBoxCodegenTestGenerated extends AbstractFirPsiBlackBoxCo
     @TestMetadata("classMethodCallExtensionSuper.kt")
     public void testClassMethodCallExtensionSuper() {
       runTest("compiler/testData/codegen/box/extensionFunctions/classMethodCallExtensionSuper.kt");
+    }
+
+    @Test
+    @TestMetadata("compoundIfFail.kt")
+    public void testCompoundIfFail() {
+      runTest("compiler/testData/codegen/box/extensionFunctions/compoundIfFail.kt");
     }
 
     @Test
@@ -34427,12 +34487,6 @@ public class FirPsiBlackBoxCodegenTestGenerated extends AbstractFirPsiBlackBoxCo
     @TestMetadata("removeIf.kt")
     public void testRemoveIf() {
       runTest("compiler/testData/codegen/box/jdk/removeIf.kt");
-    }
-
-    @Test
-    @TestMetadata("removeIfCompound.kt")
-    public void testRemoveIfCompound() {
-      runTest("compiler/testData/codegen/box/jdk/removeIfCompound.kt");
     }
 
     @Test

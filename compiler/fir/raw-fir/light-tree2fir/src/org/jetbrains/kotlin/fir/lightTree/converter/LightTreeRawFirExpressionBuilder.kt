@@ -1353,6 +1353,7 @@ class LightTreeRawFirExpressionBuilder(
             source = ifExpression.toFirSourceElement()
             with(parseIfExpression(ifExpression)) {
                 val trueBranch = convertLoopBody(thenBlock)
+
                 variables += ifVariables
                 branches += buildWhenBranch {
                     source = firCondition?.source
@@ -1411,6 +1412,7 @@ class LightTreeRawFirExpressionBuilder(
                 ELSE -> elseBlock = it
             }
         }
+        println("ifVariables: $ifVariables")
         return IfNodeComponents(firCondition, ifVariables, thenBlock, elseBlock)
     }
 

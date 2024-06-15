@@ -2553,9 +2553,35 @@ open class PsiRawFirBuilder(
         }
 
         override fun visitIfExpression(expression: KtIfExpression, data: FirElement?): FirElement {
+
+            val ktIfVariables = expression.ifVariables?.toMutableList()
+            val firIfVariables = mutableListOf<FirProperty>()
+            if (ktIfVariables != null) {
+                for (ktWhenVariable in ktIfVariables) {
+                    val name = ktWhenVariable.nameAsSafeName
+                    firIfVariables.add(
+                        buildProperty {
+                            source = ktWhenVariable.toFirSourceElement()
+                            moduleData = baseModuleData
+                            origin = FirDeclarationOrigin.Source
+                            returnTypeRef = ktWhenVariable.typeReference.toFirOrImplicitType()
+                            this.name = name
+                            initializer = ktWhenVariable.initializer?.toFirExpression("Incorrect when variable initializer")
+                            delegate = null
+                            isVar = false
+                            symbol = FirPropertySymbol(name)
+                            isLocal = true
+                            status = FirDeclarationStatusImpl(Visibilities.Local, Modality.FINAL)
+                            ktWhenVariable.extractAnnotationsTo(this)
+                        }
+                    )
+                }
+            }
+
+
             return buildWhenExpression {
                 source = expression.toFirSourceElement()
-
+                this.variables.addAll(firIfVariables)
                 val ktCondition = expression.condition
                 branches += buildWhenBranch {
                     source = ktCondition?.toFirSourceElement(KtFakeSourceElementKind.WhenCondition)

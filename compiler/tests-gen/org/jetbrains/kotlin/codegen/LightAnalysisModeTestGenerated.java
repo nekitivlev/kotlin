@@ -8331,6 +8331,11 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
       runTest("compiler/testData/codegen/box/controlStructures/compareBoxedIntegerToZero.kt");
     }
 
+    @TestMetadata("compoundWhenWithIntervals.kt")
+    public void testCompoundWhenWithIntervals() {
+      runTest("compiler/testData/codegen/box/controlStructures/compoundWhenWithIntervals.kt");
+    }
+
     @TestMetadata("conditionOfEmptyIf.kt")
     public void testConditionOfEmptyIf() {
       runTest("compiler/testData/codegen/box/controlStructures/conditionOfEmptyIf.kt");
@@ -8454,6 +8459,26 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
     @TestMetadata("forUserType.kt")
     public void testForUserType() {
       runTest("compiler/testData/codegen/box/controlStructures/forUserType.kt");
+    }
+
+    @TestMetadata("ifCompoundConst1.kt")
+    public void testIfCompoundConst1() {
+      runTest("compiler/testData/codegen/box/controlStructures/ifCompoundConst1.kt");
+    }
+
+    @TestMetadata("ifCompoundConst2.kt")
+    public void testIfCompoundConst2() {
+      runTest("compiler/testData/codegen/box/controlStructures/ifCompoundConst2.kt");
+    }
+
+    @TestMetadata("ifCompoundIncompatibleBranches.kt")
+    public void testIfCompoundIncompatibleBranches() {
+      runTest("compiler/testData/codegen/box/controlStructures/ifCompoundIncompatibleBranches.kt");
+    }
+
+    @TestMetadata("ifCompoundWithException.kt")
+    public void testIfCompoundWithException() {
+      runTest("compiler/testData/codegen/box/controlStructures/ifCompoundWithException.kt");
     }
 
     @TestMetadata("ifConst1.kt")
@@ -8729,6 +8754,16 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
     @TestMetadata("tryFinallyGeneric.kt")
     public void testTryFinallyGeneric() {
       runTest("compiler/testData/codegen/box/controlStructures/tryFinallyGeneric.kt");
+    }
+
+    @TestMetadata("tryFinallyGenericWithCompoundIf.kt")
+    public void testTryFinallyGenericWithCompoundIf() {
+      runTest("compiler/testData/codegen/box/controlStructures/tryFinallyGenericWithCompoundIf.kt");
+    }
+
+    @TestMetadata("WhenCompoundWithException.kt")
+    public void testWhenCompoundWithException() {
+      runTest("compiler/testData/codegen/box/controlStructures/WhenCompoundWithException.kt");
     }
 
     @TestMetadata("compiler/testData/codegen/box/controlStructures/breakContinueInExpressions")
@@ -9580,6 +9615,16 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
     @TestMetadata("callOnSmarcastedNothing.kt")
     public void testCallOnSmarcastedNothing() {
       runTest("compiler/testData/codegen/box/controlflow/callOnSmarcastedNothing.kt");
+    }
+
+    @TestMetadata("callOnSmartcastedNothingCompoundIf.kt")
+    public void testCallOnSmartcastedNothingCompoundIf() {
+      runTest("compiler/testData/codegen/box/controlflow/callOnSmartcastedNothingCompoundIf.kt");
+    }
+
+    @TestMetadata("callOnSmartcastedNothingCompoundWhen.kt")
+    public void testCallOnSmartcastedNothingCompoundWhen() {
+      runTest("compiler/testData/codegen/box/controlflow/callOnSmartcastedNothingCompoundWhen.kt");
     }
 
     @TestMetadata("for_loops.kt")
@@ -16845,6 +16890,11 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
     @TestMetadata("classMethodCallExtensionSuper.kt")
     public void testClassMethodCallExtensionSuper() {
       runTest("compiler/testData/codegen/box/extensionFunctions/classMethodCallExtensionSuper.kt");
+    }
+
+    @TestMetadata("compoundIfFail.kt")
+    public void testCompoundIfFail() {
+      runTest("compiler/testData/codegen/box/extensionFunctions/compoundIfFail.kt");
     }
 
     @TestMetadata("compoundWhenFail.kt")
@@ -29232,11 +29282,6 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
     @TestMetadata("removeIf.kt")
     public void testRemoveIf() {
       runTest("compiler/testData/codegen/box/jdk/removeIf.kt");
-    }
-
-    @TestMetadata("removeIfCompound.kt")
-    public void testRemoveIfCompound() {
-      runTest("compiler/testData/codegen/box/jdk/removeIfCompound.kt");
     }
 
     @TestMetadata("stream.kt")

@@ -1,0 +1,16 @@
+FILE: compoundWhenWithWhenAsStatement.kt
+    public final fun test(value: R|kotlin/Int|): R|kotlin/Unit| {
+        when (R|<local>/t|.R|kotlin/Int.plus|(Int(10))) {
+            ==($subj$, Int(0)) ->  {
+            }
+            ==($subj$, Int(1)) ->  {
+                when (R|<local>/x|.R|kotlin/Int.plus|(Int(1))) {
+                    ==($subj$, Int(2)) ->  {
+                        Boolean(false)
+                    }
+                }
+
+            }
+        }
+
+    }

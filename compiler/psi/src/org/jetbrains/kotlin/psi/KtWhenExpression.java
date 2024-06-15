@@ -36,6 +36,7 @@ public class KtWhenExpression extends KtExpressionImpl {
         return findChildrenByType(KtNodeTypes.WHEN_ENTRY);
     }
 
+
     public List<KtProperty> getWhenVariables() {
         return Arrays.asList(findChildrenByClass(KtProperty.class));
     }

@@ -23,6 +23,9 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.KtNodeTypes;
 import org.jetbrains.kotlin.lexer.KtTokens;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class KtIfExpression extends KtExpressionImpl {
     public KtIfExpression(@NotNull ASTNode node) {
         super(node);
@@ -31,6 +34,11 @@ public class KtIfExpression extends KtExpressionImpl {
     @Override
     public <R, D> R accept(@NotNull KtVisitor<R, D> visitor, D data) {
         return visitor.visitIfExpression(this, data);
+    }
+
+
+    public List<KtProperty> getIfVariables() {
+        return Arrays.asList(findChildrenByClass(KtProperty.class));
     }
 
     @Nullable @IfNotParsed
