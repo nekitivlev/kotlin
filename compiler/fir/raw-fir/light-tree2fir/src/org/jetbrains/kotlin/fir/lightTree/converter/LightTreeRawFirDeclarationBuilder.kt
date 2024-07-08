@@ -74,7 +74,6 @@ class LightTreeRawFirDeclarationBuilder(
             //TODO throw error
             throw Exception()
         }
-
         val fileSymbol = FirFileSymbol()
         var fileAnnotations = mutableListOf<FirAnnotation>()
         val importList = mutableListOf<FirImport>()
@@ -109,7 +108,6 @@ class LightTreeRawFirDeclarationBuilder(
         modifierList.forEach {
             firDeclarationList += buildErrorTopLevelDeclarationForDanglingModifierList(it)
         }
-
         return buildFile {
             symbol = fileSymbol
             source = file.toFirSourceElement()
@@ -132,17 +130,25 @@ class LightTreeRawFirDeclarationBuilder(
         return convertBlockExpressionWithoutBuilding(block).build()
     }
 
+
     fun convertBlockExpressionWithoutBuilding(block: LighterASTNode, kind: KtFakeSourceElementKind? = null): FirBlockBuilder {
         val firStatements = block.forEachChildrenReturnList<FirStatement> { node, container ->
             @Suppress("RemoveRedundantQualifierName")
             when (node.tokenType) {
                 CLASS, OBJECT_DECLARATION -> container += convertClass(node) as FirStatement
-                FUN -> container += convertFunctionDeclaration(node)
-                KtNodeTypes.PROPERTY -> container += convertPropertyDeclaration(node) as FirStatement
+                FUN -> {
+                    container += convertFunctionDeclaration(node)
+                }
+                KtNodeTypes.PROPERTY -> {
+                    container += convertPropertyDeclaration(node) as FirStatement
+
+                }
                 DESTRUCTURING_DECLARATION -> container += convertDestructingDeclaration(node).toFirDestructingDeclaration(baseModuleData)
                 TYPEALIAS -> container += convertTypeAlias(node) as FirStatement
                 CLASS_INITIALIZER -> shouldNotBeCalled("CLASS_INITIALIZER expected to be processed during class body conversion")
-                else -> if (node.isExpression()) container += expressionConverter.getAsFirStatement(node)
+                else ->{
+                    if (node.isExpression()) container += expressionConverter.getAsFirStatement(node)
+                }
             }
         }
         return FirBlockBuilder().apply {
@@ -1821,6 +1827,7 @@ class LightTreeRawFirDeclarationBuilder(
 
             val functionBuilder = if (isAnonymousFunction) {
                 FirAnonymousFunctionBuilder().apply {
+
                     source = functionSource
                     receiverParameter = receiverType?.convertToReceiverParameter()
                     symbol = functionSymbol as FirAnonymousFunctionSymbol
@@ -1894,6 +1901,7 @@ class LightTreeRawFirDeclarationBuilder(
                         convertFunctionBody(block, expression, allowLegacyContractDescription)
                     }
                     this.body = bodyWithContractDescription.first
+
                     val contractDescription = outerContractDescription ?: bodyWithContractDescription.second
                     contractDescription?.let {
                         if (this is FirSimpleFunctionBuilder) {

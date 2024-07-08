@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.fir.resolve.transformers.FirWhenExhaustivenessTransf
 import org.jetbrains.kotlin.fir.resolve.withExpectedType
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.visitors.transformSingle
+import org.jetbrains.kotlin.text
 
 class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyResolveTransformerDispatcher) :
     FirPartialBodyResolveTransformer(transformer) {
@@ -30,6 +31,7 @@ class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyRes
     // ------------------------------- Loops -------------------------------
 
     override fun transformWhileLoop(whileLoop: FirWhileLoop, data: ResolutionMode): FirStatement {
+
         val context = ResolutionMode.ContextIndependent
         return whileLoop.also(dataFlowAnalyzer::enterWhileLoop)
             .transformCondition(transformer, withExpectedType(session.builtinTypes.booleanType))
@@ -56,6 +58,7 @@ class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyRes
     // ------------------------------- When expressions -------------------------------
 
     override fun transformWhenExpression(whenExpression: FirWhenExpression, data: ResolutionMode): FirStatement {
+        println("transformWhenExpression")
         if (whenExpression.calleeReference is FirResolvedNamedReference && whenExpression.isResolved) {
             return whenExpression
         }
@@ -64,6 +67,7 @@ class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyRes
         return context.withWhenExpression(whenExpression, session) with@{
             @Suppress("NAME_SHADOWING")
             var whenExpression = whenExpression.transformSubject(transformer, ResolutionMode.ContextIndependent)
+            println("whenExpression.subject: ${whenExpression.subject?.source.text}")
             val subjectType = whenExpression.subject?.resolvedType?.fullyExpandedType(session)
             var completionNeeded = false
             context.withWhenSubjectType(subjectType, components) {
@@ -146,7 +150,7 @@ class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyRes
 
     override fun transformWhenSubjectExpression(
         whenSubjectExpression: FirWhenSubjectExpression,
-        data: ResolutionMode
+        data: ResolutionMode,
     ): FirStatement {
         dataFlowAnalyzer.exitWhenSubjectExpression(whenSubjectExpression)
         return components.transformWhenSubjectExpressionUsingSmartcastInfo(whenSubjectExpression)
@@ -196,7 +200,7 @@ class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyRes
 
     override fun transformReturnExpression(
         returnExpression: FirReturnExpression,
-        data: ResolutionMode
+        data: ResolutionMode,
     ): FirStatement {
         val labeledElement = returnExpression.target.labeledElement
         val expectedTypeRef = labeledElement.returnTypeRef
@@ -228,7 +232,7 @@ class FirControlFlowStatementsResolveTransformer(transformer: FirAbstractBodyRes
 
     override fun transformElvisExpression(
         elvisExpression: FirElvisExpression,
-        data: ResolutionMode
+        data: ResolutionMode,
     ): FirStatement {
         if (elvisExpression.calleeReference is FirResolvedNamedReference) return elvisExpression
         elvisExpression.transformAnnotations(transformer, data)

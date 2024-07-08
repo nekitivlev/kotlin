@@ -2554,6 +2554,8 @@ open class PsiRawFirBuilder(
 
         override fun visitIfExpression(expression: KtIfExpression, data: FirElement?): FirElement {
             return buildWhenExpression {
+
+
                 source = expression.toFirSourceElement()
 
                 val ktCondition = expression.condition

@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.lang.PsiBuilder;
+import com.intellij.lang.SyntaxTreeBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
@@ -42,8 +43,10 @@ import static org.jetbrains.kotlin.parsing.KotlinWhitespaceAndCommentsBindersKt.
 import static org.jetbrains.kotlin.parsing.KotlinWhitespaceAndCommentsBindersKt.TRAILING_ALL_COMMENTS_BINDER;
 
 public class KotlinExpressionParsing extends AbstractKotlinParsing {
-    private static final TokenSet WHEN_CONDITION_RECOVERY_SET = TokenSet.create(RBRACE, IN_KEYWORD, NOT_IN, IS_KEYWORD, NOT_IS, ELSE_KEYWORD);
-    private static final TokenSet WHEN_CONDITION_RECOVERY_SET_WITH_ARROW = TokenSet.create(RBRACE, IN_KEYWORD, NOT_IN, IS_KEYWORD, NOT_IS, ELSE_KEYWORD, ARROW, DOT);
+    private static final TokenSet WHEN_CONDITION_RECOVERY_SET =
+            TokenSet.create(RBRACE, IN_KEYWORD, NOT_IN, IS_KEYWORD, NOT_IS, ELSE_KEYWORD);
+    private static final TokenSet WHEN_CONDITION_RECOVERY_SET_WITH_ARROW =
+            TokenSet.create(RBRACE, IN_KEYWORD, NOT_IN, IS_KEYWORD, NOT_IS, ELSE_KEYWORD, ARROW, DOT);
     private static final ImmutableMap<String, KtToken> KEYWORD_TEXTS = tokenSetToMap(KEYWORDS);
 
     private static final TokenSet TOKEN_SET_TO_FOLLOW_AFTER_DESTRUCTURING_DECLARATION_IN_LAMBDA = TokenSet.create(ARROW, COMMA, COLON);
@@ -223,9 +226,8 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
         }
 
         /**
-         *
          * @param operation the operation sign (e.g. PLUS or IS)
-         * @param parser the parser object
+         * @param parser    the parser object
          * @return node type of the result
          */
         public IElementType parseRightHandSide(IElementType operation, KotlinExpressionParsing parser) {
@@ -452,7 +454,6 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
      */
     private void parsePostfixExpression() {
         PsiBuilder.Marker expression = mark();
-
         boolean firstExpressionParsed = at(COLONCOLON) ? parseDoubleColonSuffix(mark()) : parseAtomicExpression();
 
         while (true) {
@@ -503,6 +504,7 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
      *   ;
      */
     private boolean parseCallSuffix() {
+
         if (parseCallWithClosure()) {
             // do nothing
         }
@@ -856,11 +858,15 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
      */
     private void parseWhen() {
         assert _at(WHEN_KEYWORD);
+        PsiBuilder.Marker functionCall = mark();
+        PsiBuilder.Marker compoundExpression1 = mark();
+        PsiBuilder.Marker compoundExpression = mark();
+        PsiBuilder.Marker block = mark();
 
         PsiBuilder.Marker when = mark();
 
         advance(); // WHEN_KEYWORD
-
+        int count = 0;
         // Parse condition
         myBuilder.disableNewlines();
         if (at(LPAR)) {
@@ -873,6 +879,28 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
 
                 atWhenStart.done(declType);
                 atWhenStart.setCustomEdgeTokenBinders(PrecedingDocCommentsBinder.INSTANCE, TrailingCommentsBinder.INSTANCE);
+                if (at(SEMICOLON)) {
+                    advance();
+                    while (true) {
+                        count++;
+                        SyntaxTreeBuilder.Marker atWhenStarts = mark();
+                        if (at(VAL_KEYWORD)) {
+                            count++;
+                            IElementType declTypeNew = myKotlinParsing.parseProperty(KotlinParsing.DeclarationParsingMode.LOCAL);
+
+                            atWhenStarts.done(declTypeNew);
+                            atWhenStarts.setCustomEdgeTokenBinders(PrecedingDocCommentsBinder.INSTANCE, TrailingCommentsBinder.INSTANCE);
+                            if (at(SEMICOLON)) {
+                                advance();
+                            }
+                        }
+                        else {
+                            atWhenStarts.drop();
+                            parseExpression();
+                            break;
+                        }
+                    }
+                }
             }
             else {
                 atWhenStart.drop();
@@ -894,7 +922,20 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
         }
         myBuilder.restoreNewlinesState();
 
+
         when.done(WHEN);
+        if (count != 0) {
+            block.done(BLOCK);
+            compoundExpression.done(COMPOUND_EXPRESSION);
+            compoundExpression1.done(COMPOUND_EXPRESSION);
+            functionCall.done(CALL_EXPRESSION);
+        }
+        else {
+            block.drop();
+            compoundExpression.drop();
+            compoundExpression1.drop();
+            functionCall.drop();
+        }
     }
 
     /*
@@ -1143,17 +1184,17 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
      *   ;
      */
     private void parseFunctionLiteral() {
+
         parseFunctionLiteral(/* preferBlock = */false, /* collapse = */true);
     }
 
     /**
      * If it has no ->, it's a block, otherwise a function literal
-     *
+     * <p>
      * Please update {@link org.jetbrains.kotlin.BlockExpressionElementType#isParsable(ASTNode, CharSequence, Language, Project)} if any changes occurs!
      */
     public void parseFunctionLiteral(boolean preferBlock, boolean collapse) {
         assert _at(LBRACE);
-
         PsiBuilder.Marker literalExpression = mark();
 
         PsiBuilder.Marker literal = mark();
@@ -1225,9 +1266,11 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
         return false;
     }
 
-    private boolean rollbackOrDrop(PsiBuilder.Marker rollbackMarker,
+    private boolean rollbackOrDrop(
+            PsiBuilder.Marker rollbackMarker,
             KtToken expected, String expectMessage,
-            IElementType validForDrop) {
+            IElementType validForDrop
+    ) {
         if (at(expected)) {
             advance(); // dropAt
             rollbackMarker.drop();
@@ -1303,9 +1346,9 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
     }
 
     /*
-         * expressions
-         *   : SEMI* statement{SEMI+} SEMI*
-         */
+     * expressions
+     *   : SEMI* statement{SEMI+} SEMI*
+     */
     public void parseStatements(boolean isScriptTopLevel) {
         while (at(SEMICOLON)) advance(); // SEMICOLON
         while (!eof() && !at(RBRACE)) {
@@ -1345,7 +1388,7 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
             if (!atSet(EXPRESSION_FIRST)) {
                 errorAndAdvance("Expecting a statement");
             }
-            else if (isScriptTopLevel){
+            else if (isScriptTopLevel) {
                 PsiBuilder.Marker scriptInitializer = mark();
                 parseBlockLevelExpression();
                 scriptInitializer.done(SCRIPT_INITIALIZER);
@@ -1618,24 +1661,62 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
     /*
      * if
      *   : "if" "(" element ")" element SEMI? ("else" element)?
+     *   : "if" "(" modifiers "val" SimpleName "=" element SEMI element")"
      *   ;
      */
     private void parseIf() {
+
         assert _at(IF_KEYWORD);
 
-        PsiBuilder.Marker marker = mark();
 
-        advance(); //IF_KEYWORD
+        //IF_KEYWORD
+        PsiBuilder.Marker functionCall = mark();
+        PsiBuilder.Marker compoundExpression1 = mark();
+        PsiBuilder.Marker compoundExpression = mark();
+        PsiBuilder.Marker block = mark();
+        PsiBuilder.Marker ifstatement = mark();
+        advance();
+        myBuilder.disableNewlines();
+        int count = 0;
+        if (expect(LPAR, "Expecting a condition in parentheses '(...)'", EXPRESSION_FIRST)) {
+            while (true) {
+                PsiBuilder.Marker atIfStart = mark();
+                if (at(VAL_KEYWORD)) {
+                    count++;
+                    IElementType declType = myKotlinParsing.parseProperty(KotlinParsing.DeclarationParsingMode.LOCAL);
+                    atIfStart.done(declType);
+                    atIfStart.setCustomEdgeTokenBinders(PrecedingDocCommentsBinder.INSTANCE, TrailingCommentsBinder.INSTANCE);
+                    if (at(SEMICOLON)) {
+                        advance();
+                    }
+                }
+                else {
+                    atIfStart.drop();
+                    break;
+                }
+            }
+            if (at(SEMICOLON)) {
+                advance(); // SEMICOLON
+            }
 
-        parseCondition();
+            PsiBuilder.Marker condition = mark();
+            parseExpression();
+            condition.done(CONDITION);
+            expect(RPAR, "Expecting ')");
+        }
+
+
+        myBuilder.restoreNewlinesState();
 
         PsiBuilder.Marker thenBranch = mark();
+
         if (!at(ELSE_KEYWORD) && !at(SEMICOLON)) {
             parseControlStructureBody();
         }
         if (at(SEMICOLON) && lookahead(1) == ELSE_KEYWORD) {
             advance(); // SEMICOLON
         }
+
         thenBranch.done(THEN);
 
         // lookahead for arrow is needed to prevent capturing of whenEntry like "else -> "
@@ -1649,7 +1730,19 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
             elseBranch.done(ELSE);
         }
 
-        marker.done(IF);
+        ifstatement.done(IF);
+        if (count != 0) {
+            block.done(BLOCK);
+            compoundExpression.done(COMPOUND_EXPRESSION);
+            compoundExpression1.done(COMPOUND_EXPRESSION);
+            functionCall.done(CALL_EXPRESSION);
+        }
+        else {
+            block.drop();
+            compoundExpression.drop();
+            compoundExpression1.drop();
+            functionCall.drop();
+        }
     }
 
     /*
@@ -1659,6 +1752,7 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
         myBuilder.disableNewlines();
 
         if (expect(LPAR, "Expecting a condition in parentheses '(...)'", EXPRESSION_FIRST)) {
+
             PsiBuilder.Marker condition = mark();
             parseExpression();
             condition.done(CONDITION);
