@@ -1,0 +1,29 @@
+FILE: compoundWhenSubjectExpression.kt
+    public final fun whenWithSubjectExpression(x: R|kotlin/Any|): R|kotlin/Unit| {
+        when (R|<local>/y|) {
+            ($subj$ !is R|kotlin/Double|) ->  {
+                Int(-1)
+            }
+            ==($subj$, Double(0.0)) ->  {
+                Int(0)
+            }
+            else ->  {
+                R|<local>/x|.R|kotlin/Double.toInt|()
+            }
+        }
+
+    }
+    public final fun whenWithSubjectVariable(x: R|kotlin/Any|): R|kotlin/Unit| {
+        when (R|<local>/y|) {
+            ($subj$ !is R|kotlin/Double|) ->  {
+                Int(-1)
+            }
+            ==($subj$, Double(0.0)) ->  {
+                Int(0)
+            }
+            else ->  {
+                R|<local>/y|.R|kotlin/Double.toInt|()
+            }
+        }
+
+    }

@@ -96,6 +96,7 @@ class Fir2IrConverter(
         //   4. Override processing which sets overridden symbols for everything inside non-local regular classes
         @OptIn(FirBasedFakeOverrideGenerator::class)
         if (configuration.useFirBasedFakeOverrideGenerator) {
+
             for (firFile in allFirFiles) {
                 bindFakeOverridesInFile(firFile)
             }

@@ -465,6 +465,7 @@ class Fir2IrVisitor(
         val isNextVariable = initializer is FirFunctionCall &&
                 initializer.calleeReference.toResolvedNamedFunctionSymbol()?.callableId?.isIteratorNext() == true &&
                 variable.source?.isChildOfForLoop == true
+
         val irVariable = declarationStorage.createAndCacheIrVariable(
             variable, conversionScope.parentFromStack(),
             if (isNextVariable) {
@@ -1224,14 +1225,17 @@ class Fir2IrVisitor(
 
             generateWhen(
                 startOffset, endOffset, IrStatementOrigin.ELVIS,
-                irLhsVariable, irBranches,
+                irLhsVariable, null, irBranches,
                 elvisExpression.resolvedType.toIrType()
             )
         }
     }
 
     override fun visitWhenExpression(whenExpression: FirWhenExpression, data: Any?): IrElement {
+        val whenVariables = generateWhenVariable(whenExpression)
         val subjectVariable = generateWhenSubjectVariable(whenExpression)
+
+
         val origin = when (whenExpression.source?.elementType) {
             KtNodeTypes.WHEN -> IrStatementOrigin.WHEN
             KtNodeTypes.IF -> IrStatementOrigin.IF
@@ -1243,7 +1247,8 @@ class Fir2IrVisitor(
             KtNodeTypes.POSTFIX_EXPRESSION -> IrStatementOrigin.EXCLEXCL
             else -> null
         }
-        return conversionScope.withWhenSubject(subjectVariable) {
+
+        return conversionScope.withWhenSubject(subjectVariable, whenVariables) {
             whenExpression.convertWithOffsets { startOffset, endOffset ->
                 if (whenExpression.branches.isEmpty()) {
                     return@convertWithOffsets IrBlockImpl(startOffset, endOffset, irBuiltIns.unitType, origin)
@@ -1269,7 +1274,7 @@ class Fir2IrVisitor(
                         IrConstImpl.boolean(startOffset, endOffset, irBuiltIns.booleanType, true), irResult
                     )
                 }
-                generateWhen(startOffset, endOffset, origin, subjectVariable, irBranches, whenExpressionType.toIrType())
+                generateWhen(startOffset, endOffset, origin, subjectVariable, whenVariables, irBranches, whenExpressionType.toIrType())
             }
         }.also {
             whenExpression.accept(implicitCastInserter, it)
@@ -1332,15 +1337,24 @@ class Fir2IrVisitor(
         endOffset: Int,
         origin: IrStatementOrigin?,
         subjectVariable: IrVariable?,
+        whenVariables: List<IrVariable>?,
         branches: List<IrBranch>,
         resultType: IrType
     ): IrExpression {
         // Note: ELVIS origin is set only on wrapping block
         val irWhen = IrWhenImpl(startOffset, endOffset, resultType, origin.takeIf { it != IrStatementOrigin.ELVIS }, branches)
-        return if (subjectVariable == null) {
+        return if (subjectVariable == null && whenVariables == null) {
             irWhen
-        } else {
+        } else if (subjectVariable != null && whenVariables == null) {
             IrBlockImpl(startOffset, endOffset, irWhen.type, origin, listOf(subjectVariable, irWhen))
+        } else if (subjectVariable == null && !whenVariables.isNullOrEmpty()) {
+            val temp: List<IrStatement> = whenVariables + irWhen
+            IrBlockImpl(startOffset, endOffset, irWhen.type, origin, temp)
+        } else if (subjectVariable != null && !whenVariables.isNullOrEmpty()) {
+            val temp: List<IrStatement> = whenVariables + subjectVariable + irWhen
+            IrBlockImpl(startOffset, endOffset, irWhen.type, origin, temp)
+        }else{
+            irWhen
         }
     }
 
@@ -1353,6 +1367,14 @@ class Fir2IrVisitor(
                 applyParentFromStackTo(callablesGenerator.declareTemporaryVariable(convertToIrExpression(subjectExpression), "subject"))
             }
             else -> null
+        }
+    }
+
+    private fun generateWhenVariable(whenExpression: FirWhenExpression): List<IrVariable>? {
+        val whenVariables = whenExpression.variables
+        return when {
+            whenVariables.isEmpty() -> null
+            else -> whenVariables.map { it.accept(this, null) as IrVariable }
         }
     }
 

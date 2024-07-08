@@ -62,7 +62,7 @@ object JvmResolveUtil {
                 throw TestsCompiletimeError(e)
             }
         }
-
+        println("analyzeAndCheckForErrors")
         return analyze(project, files, configuration, packagePartProvider, trace, klibList).apply {
             try {
                 AnalyzingUtils.throwExceptionOnErrors(bindingContext)

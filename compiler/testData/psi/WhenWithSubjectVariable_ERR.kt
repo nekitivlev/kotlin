@@ -10,4 +10,4 @@ fun test() {
     when (interface I {}) {}
     when (object Obj {}) {}
     when (typealias TA = T) {}
-}
+}org.jetbrains.kotlin.codegen.LightAnalysisModeTestGenerated

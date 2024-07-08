@@ -948,7 +948,9 @@ class BodyResolveContext(
     }
 
     fun <T> withWhenExpression(whenExpression: FirWhenExpression, session: FirSession, f: () -> T): T {
-        if (whenExpression.subjectVariable == null) return f()
+        if (whenExpression.subjectVariable == null && whenExpression.variables.isEmpty()){
+            return f()
+        }
         return forBlock(session, f)
     }
 

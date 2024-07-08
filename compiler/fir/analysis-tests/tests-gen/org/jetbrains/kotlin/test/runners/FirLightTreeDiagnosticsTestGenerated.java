@@ -141,6 +141,42 @@ public class FirLightTreeDiagnosticsTestGenerated extends AbstractFirLightTreeDi
     }
 
     @Test
+    @TestMetadata("compoundIf.kt")
+    public void testCompoundIf() {
+      runTest("compiler/fir/analysis-tests/testData/resolve/compoundIf.kt");
+    }
+
+    @Test
+    @TestMetadata("compoundWhenAsReceiver.kt")
+    public void testCompoundWhenAsReceiver() {
+      runTest("compiler/fir/analysis-tests/testData/resolve/compoundWhenAsReceiver.kt");
+    }
+
+    @Test
+    @TestMetadata("compoundWhenElse.kt")
+    public void testCompoundWhenElse() {
+      runTest("compiler/fir/analysis-tests/testData/resolve/compoundWhenElse.kt");
+    }
+
+    @Test
+    @TestMetadata("compoundWhenExpressionType.kt")
+    public void testCompoundWhenExpressionType() {
+      runTest("compiler/fir/analysis-tests/testData/resolve/compoundWhenExpressionType.kt");
+    }
+
+    @Test
+    @TestMetadata("compoundWhenInference.kt")
+    public void testCompoundWhenInference() {
+      runTest("compiler/fir/analysis-tests/testData/resolve/compoundWhenInference.kt");
+    }
+
+    @Test
+    @TestMetadata("compoundWhenWithWhenAsStatement.kt")
+    public void testCompoundWhenWithWhenAsStatement() {
+      runTest("compiler/fir/analysis-tests/testData/resolve/compoundWhenWithWhenAsStatement.kt");
+    }
+
+    @Test
     @TestMetadata("constantValues.kt")
     public void testConstantValues() {
       runTest("compiler/fir/analysis-tests/testData/resolve/constantValues.kt");
@@ -1326,6 +1362,18 @@ public class FirLightTreeDiagnosticsTestGenerated extends AbstractFirLightTreeDi
       }
 
       @Test
+      @TestMetadata("compoundEmptyWhen.kt")
+      public void testCompoundEmptyWhen() {
+        runTest("compiler/fir/analysis-tests/testData/resolve/cfg/compoundEmptyWhen.kt");
+      }
+
+      @Test
+      @TestMetadata("compoundWhen.kt")
+      public void testCompoundWhen() {
+        runTest("compiler/fir/analysis-tests/testData/resolve/cfg/compoundWhen.kt");
+      }
+
+      @Test
       @TestMetadata("defaultArguments.kt")
       public void testDefaultArguments() {
         runTest("compiler/fir/analysis-tests/testData/resolve/cfg/defaultArguments.kt");
@@ -2169,6 +2217,18 @@ public class FirLightTreeDiagnosticsTestGenerated extends AbstractFirLightTreeDi
         }
 
         @Test
+        @TestMetadata("compoundExhaustiveWhenAndDNNType.kt")
+        public void testCompoundExhaustiveWhenAndDNNType() {
+          runTest("compiler/fir/analysis-tests/testData/resolve/exhaustiveness/positive/compoundExhaustiveWhenAndDNNType.kt");
+        }
+
+        @Test
+        @TestMetadata("compoundExhaustiveWhenAndFlexibleType.kt")
+        public void testCompoundExhaustiveWhenAndFlexibleType() {
+          runTest("compiler/fir/analysis-tests/testData/resolve/exhaustiveness/positive/compoundExhaustiveWhenAndFlexibleType.kt");
+        }
+
+        @Test
         @TestMetadata("exhaustiveWhenAndDNNType.kt")
         public void testExhaustiveWhenAndDNNType() {
           runTest("compiler/fir/analysis-tests/testData/resolve/exhaustiveness/positive/exhaustiveWhenAndDNNType.kt");
@@ -2315,6 +2375,12 @@ public class FirLightTreeDiagnosticsTestGenerated extends AbstractFirLightTreeDi
       @TestMetadata("companionExtension.kt")
       public void testCompanionExtension() {
         runTest("compiler/fir/analysis-tests/testData/resolve/expresssions/companionExtension.kt");
+      }
+
+      @Test
+      @TestMetadata("compoundWhen.kt")
+      public void testCompoundWhen() {
+        runTest("compiler/fir/analysis-tests/testData/resolve/expresssions/compoundWhen.kt");
       }
 
       @Test
@@ -3412,6 +3478,12 @@ public class FirLightTreeDiagnosticsTestGenerated extends AbstractFirLightTreeDi
       }
 
       @Test
+      @TestMetadata("compoundIfInBuildMap.kt")
+      public void testCompoundIfInBuildMap() {
+        runTest("compiler/fir/analysis-tests/testData/resolve/inference/compoundIfInBuildMap.kt");
+      }
+
+      @Test
       @TestMetadata("definitelyNotNullIntersectionType.kt")
       public void testDefinitelyNotNullIntersectionType() {
         runTest("compiler/fir/analysis-tests/testData/resolve/inference/definitelyNotNullIntersectionType.kt");
@@ -3893,6 +3965,12 @@ public class FirLightTreeDiagnosticsTestGenerated extends AbstractFirLightTreeDi
       @TestMetadata("complexLambdaWithTypeVariableAsExpectedType.kt")
       public void testComplexLambdaWithTypeVariableAsExpectedType() {
         runTest("compiler/fir/analysis-tests/testData/resolve/problems/complexLambdaWithTypeVariableAsExpectedType.kt");
+      }
+
+      @Test
+      @TestMetadata("compoundIncompleteWhen.kt")
+      public void testCompoundIncompleteWhen() {
+        runTest("compiler/fir/analysis-tests/testData/resolve/problems/compoundIncompleteWhen.kt");
       }
 
       @Test
@@ -4522,6 +4600,12 @@ public class FirLightTreeDiagnosticsTestGenerated extends AbstractFirLightTreeDi
       }
 
       @Test
+      @TestMetadata("compoundOrInWhenBranch.kt")
+      public void testCompoundOrInWhenBranch() {
+        runTest("compiler/fir/analysis-tests/testData/resolve/smartcasts/compoundOrInWhenBranch.kt");
+      }
+
+      @Test
       @TestMetadata("contractSafeCall.kt")
       public void testContractSafeCall() {
         runTest("compiler/fir/analysis-tests/testData/resolve/smartcasts/contractSafeCall.kt");
@@ -4764,6 +4848,24 @@ public class FirLightTreeDiagnosticsTestGenerated extends AbstractFirLightTreeDi
         @Test
         public void testAllFilesPresentInControlStructures() {
           KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/fir/analysis-tests/testData/resolve/smartcasts/controlStructures"), Pattern.compile("^([^.]+)\\.kt$"), null, true);
+        }
+
+        @Test
+        @TestMetadata("compoundReturnFromWhen.kt")
+        public void testCompoundReturnFromWhen() {
+          runTest("compiler/fir/analysis-tests/testData/resolve/smartcasts/controlStructures/compoundReturnFromWhen.kt");
+        }
+
+        @Test
+        @TestMetadata("compoundSimpleIf.kt")
+        public void testCompoundSimpleIf() {
+          runTest("compiler/fir/analysis-tests/testData/resolve/smartcasts/controlStructures/compoundSimpleIf.kt");
+        }
+
+        @Test
+        @TestMetadata("compoundWhenSubjectExpression.kt")
+        public void testCompoundWhenSubjectExpression() {
+          runTest("compiler/fir/analysis-tests/testData/resolve/smartcasts/controlStructures/compoundWhenSubjectExpression.kt");
         }
 
         @Test

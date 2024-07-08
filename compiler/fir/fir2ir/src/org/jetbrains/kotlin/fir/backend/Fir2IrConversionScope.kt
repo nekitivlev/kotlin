@@ -172,12 +172,18 @@ class Fir2IrConversionScope(val configuration: Fir2IrConfiguration) {
     @PrivateForInline
     internal val safeCallSubjectVariableStack = mutableListOf<IrVariable>()
 
-    inline fun <T> withWhenSubject(subject: IrVariable?, f: () -> T): T {
+    inline fun <T> withWhenSubject(subject: IrVariable?, whenVariables: List<IrVariable>?, f: () -> T): T {
+        if (whenVariables != null) whenSubjectVariableStack +=whenVariables
         if (subject != null) whenSubjectVariableStack += subject
         try {
             return f()
         } finally {
             if (subject != null) whenSubjectVariableStack.removeAt(whenSubjectVariableStack.size - 1)
+            if (whenVariables != null) {
+                for (i in 1..whenVariables.size) {
+                    whenSubjectVariableStack.removeAt(whenSubjectVariableStack.size - 1)
+                }
+            }
         }
     }
 

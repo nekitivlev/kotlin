@@ -866,6 +866,7 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
         if (at(LPAR)) {
             advanceAt(LPAR);
 
+
             PsiBuilder.Marker atWhenStart = mark();
             myKotlinParsing.parseAnnotationsList(EQ_RPAR_SET);
             if (at(VAL_KEYWORD) || at(VAR_KEYWORD)) {
@@ -873,6 +874,27 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
 
                 atWhenStart.done(declType);
                 atWhenStart.setCustomEdgeTokenBinders(PrecedingDocCommentsBinder.INSTANCE, TrailingCommentsBinder.INSTANCE);
+
+                if(at(SEMICOLON)){
+                    advance();
+                    while(true){
+                        PsiBuilder.Marker atWhenStarts = mark();
+                        if (at(VAL_KEYWORD)) {
+                            IElementType declTypeNew = myKotlinParsing.parseProperty(KotlinParsing.DeclarationParsingMode.LOCAL);
+
+                            atWhenStarts.done(declTypeNew);
+                            atWhenStarts.setCustomEdgeTokenBinders(PrecedingDocCommentsBinder.INSTANCE, TrailingCommentsBinder.INSTANCE);
+                            if (at(SEMICOLON)) {
+                                advance();
+                            }
+                        }
+                        else {
+                            atWhenStarts.drop();
+                            parseExpression();
+                            break;
+                        }
+                    }
+                }
             }
             else {
                 atWhenStart.drop();
@@ -1627,7 +1649,33 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
 
         advance(); //IF_KEYWORD
 
-        parseCondition();
+
+        if (expect(LPAR, "Expecting a condition in parentheses '(...)'", EXPRESSION_FIRST)) {
+            while (true) {
+                PsiBuilder.Marker atIfStart = mark();
+                if (at(VAL_KEYWORD)) {
+                    IElementType declType = myKotlinParsing.parseProperty(KotlinParsing.DeclarationParsingMode.LOCAL);
+                    atIfStart.done(declType);
+                    atIfStart.setCustomEdgeTokenBinders(PrecedingDocCommentsBinder.INSTANCE, TrailingCommentsBinder.INSTANCE);
+                    if (at(SEMICOLON)) {
+                        advance();
+                    }
+                }
+                else {
+                    atIfStart.drop();
+                    break;
+                }
+            }
+            if (at(SEMICOLON)) {
+                advance(); // SEMICOLON
+            }
+
+            PsiBuilder.Marker condition = mark();
+            parseExpression();
+            condition.done(CONDITION);
+            expect(RPAR, "Expecting ')");
+        }
+
 
         PsiBuilder.Marker thenBranch = mark();
         if (!at(ELSE_KEYWORD) && !at(SEMICOLON)) {
